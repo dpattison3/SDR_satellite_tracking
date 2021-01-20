@@ -1,3 +1,6 @@
 # Exclude the raw data files.
 **/*.sdriq
 **/*.dat
+
+# Exclude ipython checkpoints.
+**/.ipynb_checkpoints/*
