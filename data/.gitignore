@@ -1,0 +1,4 @@
+# Ignore everything in this data directory
+*
+# Except this file so we always have an untracked data dir.
+!.gitignore

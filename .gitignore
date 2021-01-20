@@ -1,0 +1,3 @@
+# Exclude the raw data files.
+**/*.sdriq
+**/*.dat
