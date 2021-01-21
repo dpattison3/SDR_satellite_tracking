@@ -1,0 +1,43 @@
+#%%
+# import statements
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.signal as signal
+
+#%%
+# import the binary file
+rawData_benGS = np.fromfile("test_out_20210117.dat", dtype="uint8")
+# subtract 255/2 to go from unsigned to signed values
+data = rawData - 127.5
+# split the data into its real and imaginary parts
+realParts = data[0::2]
+imagParts = data[1::2]
+# create a variable that has the real and imaginary parts together
+cplx = realParts + 1j * imagParts
+
+#%%
+# define center freq (Hz)
+centerFreq = 98.5e6
+
+# +/- bandwidth for plotting (Hz)
+bwdth = 400e3
+
+# define sample frequency
+sampFreq = 2.0e6
+# %%
+plt.specgram(cplx, NFFT=4096 * 8, Fs=sampFreq, Fc=centerFreq)
+plt.title("PSD of signal")
+plt.xlabel("Time")
+plt.ylabel("Frequency")
+plt.ylim([centerFreq - bwdth, centerFreq + bwdth])
+plt.show()
+
+# %%
+plt.psd(cplx, NFFT=4096 * 8, Fs=sampFreq, Fc=centerFreq)
+plt.ylim([-42, 0])
+plt.yticks(ticks=[-45, -40, -35, -30, -25, -20, -15, -10, -5, 0])
+plt.title("PSD of signal")
+
+# %%
+
+# %%

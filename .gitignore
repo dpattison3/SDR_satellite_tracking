@@ -4,3 +4,9 @@
 
 # Exclude ipython checkpoints.
 **/.ipynb_checkpoints/*
+
+# virtual environments
+venv/
+
+# vscode things
+.vscode

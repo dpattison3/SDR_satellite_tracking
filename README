@@ -1,0 +1,49 @@
+This is the read me file for this little science project
+
+Repos that are used or referenced in this project
+    - The 2 frequency librtlsdr library by DC9ST
+    - https://github.com/DC9ST/librtlsdr-2freq
+
+    - The original rtl sdr library by steve-m
+    - https://github.com/steve-m/librtlsdr
+
+
+Overview of goals (in no particular order at the moment)
+    X   1.  Make a plan
+	X   2.  Demonstrate 2 frequency data record as shown in TDOA paper
+	    3.  Demonstrate reception of satellite transponder signal
+	    4.  Figure out how many ground stations are required and where they should be located
+	~   5.  Figure out how to configure remote access of the ground stations
+	~   6.  Demonstrate locating of ground based signals using multiple ground stations
+	    7.  Figure out how to embed processing capability or a way to do it that doesn’t involve running matlab
+	    8.  Demonstrate embedded capability using ground based signals 
+	    9.  Deploy ground stations and locate satellites
+	    10. Incorporate satellite position measurements into kalman filter estimator
+        11. Characterize errors and incorporate covariance into estimate
+    
+    X   = complete
+    ~   = in progress
+
+Resources
+    https://pysdr.org/content/sampling.html#quadrature-sampling
+
+    http://witestlab.poly.edu/~ffund/el9043/labs/lab1.html
+    
+
+
+Satellite contact CONOPS
+    1.  Plan satellite observation
+	2.  Satellite crosses elevation mask
+	3.  Ground station begins observations
+		a.  Start on reference frequency
+		    i.  Collect min number of samples
+		b.  Switch to satellite transponder frequency
+			i.  Collect min number of samples
+		c.  Switch to reference frequency
+			i.  Collect min number of samples
+	4.  (IOD requires 3 observations so we’ll divide up the anticipated contact period into 3)
+	5.  Repeat observation 3 times during contact assuming some minimum contact duration
+    6.  Measurements fed into kalman filter estimator
+
+
+
