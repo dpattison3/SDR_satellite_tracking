@@ -42,7 +42,7 @@ else:
 
 #%%
 """
-Transmitted location according to wikipedia
+Transmitter location according to wikipedia
 https://geohack.toolforge.org/geohack.php?pagename=KUFX&params=37.205_N_121.950_W_type:landmark_region:US-CA_source:FCC
 repeaters here
     37.151583    -121.609917 (SE of SJ)
@@ -57,9 +57,9 @@ lags = signal.correlation_lags(len(benCplx[:nS_each]), len(domCplx[:nS_each]))
 #%%
 # plot the correlation.
 xVals = np.linspace(0, np.size(xCorr), np.size(xCorr))
-plt.plot(xCorr)
+plt.plot(np.abs(xCorr))
 plt.show()
-plt.plot(lags, xCorr)
+plt.plot(lags, np.abs(xCorr))
 plt.show()
 
 #%%
