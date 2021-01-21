@@ -7,8 +7,8 @@ Repos that are used or referenced in this project
     - The original rtl sdr library by steve-m
     - https://github.com/steve-m/librtlsdr
 
-	- TDOA analysis
-	- https://github.com/DC9ST/tdoa-evaluation-rtlsdr.git
+    - TDOA analysis
+    - https://github.com/DC9ST/tdoa-evaluation-rtlsdr.git
 
 Overview of goals (in no particular order at the moment)
 	X   1.  Make a plan
@@ -34,7 +34,7 @@ Resources
 
 
 Satellite contact CONOPS
-    	1.  Plan satellite observation
+    1.  Plan satellite observation
 	2.  Satellite crosses elevation mask
 	3.  Ground station begins observations
 		a.  Start on reference frequency
