@@ -9,7 +9,7 @@ Repos that are used or referenced in this project
 
 
 Overview of goals (in no particular order at the moment)
-    X   1.  Make a plan
+    	X   1.  Make a plan
 	X   2.  Demonstrate 2 frequency data record as shown in TDOA paper
 	    3.  Demonstrate reception of satellite transponder signal
 	    4.  Figure out how many ground stations are required and where they should be located
