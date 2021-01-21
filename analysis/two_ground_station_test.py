@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
+import scipy
 
 #%%
 # import the binary file
@@ -55,7 +56,36 @@ xCorr = signal.correlate(benCplx[:nS_each], domCplx[:nS_each])
 lags = signal.correlation_lags(len(benCplx[:nS_each]), len(domCplx[:nS_each]))
 
 #%%
-# plot the correlation.
+# this method uses the differential phase talked about at the same link
+dPhase_benGS = np.diff(np.unwrap(np.angle(benCplx[:nS_each])))
+dPhase_domGS = np.diff(np.unwrap(np.angle(domCplx[:nS_each])))
+
+# append a zero to the beginning to make the length of the abs correlation (size fit)
+dPhase_benGS = np.append(0, dPhase_benGS)
+dPhase_domGS = np.append(0, dPhase_domGS)
+
+# remove the mean
+dPhase_benGS = dPhase_benGS - np.mean(dPhase_benGS)
+dPhase_domGS = dPhase_domGS - np.mean(dPhase_domGS)
+
+dPhaseXcorr = signal.correlate(dPhase_benGS, dPhase_domGS)
+dPhaseXcorr_lags = signal.correlation_lags(len(dPhase_benGS), len(dPhase_domGS))
+ref1 = max(signal.correlate(dPhase_benGS, dPhase_benGS))
+ref2 = max(signal.correlate(dPhase_domGS, dPhase_domGS))
+dPhaseXcorr_max = np.max(dPhaseXcorr)
+
+result = (100 * 2 * dPhaseXcorr_max) / (ref1 + ref2)
+print(result)
+#%%
+# plot the differential phase correlation
+plt.plot(dPhaseXcorr_lags, dPhaseXcorr)
+plt.xlabel("Lag [samples]")
+plt.ylabel("Not sure... correlation maybe?")
+plt.show()
+
+
+#%%
+# plot the complex correlation.
 xVals = np.linspace(0, np.size(xCorr), np.size(xCorr))
 plt.plot(np.abs(xCorr))
 plt.show()
