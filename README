@@ -7,6 +7,8 @@ Repos that are used or referenced in this project
     - The original rtl sdr library by steve-m
     - https://github.com/steve-m/librtlsdr
 
+	- TDOA analysis
+	- https://github.com/DC9ST/tdoa-evaluation-rtlsdr.git
 
 Overview of goals (in no particular order at the moment)
 	X   1.  Make a plan
