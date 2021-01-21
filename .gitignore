@@ -10,3 +10,6 @@ venv/
 
 # vscode things
 .vscode
+
+# other misc things
+.DS_Store
