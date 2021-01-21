@@ -6,6 +6,14 @@ import scipy.signal as signal
 import scipy
 
 #%%
+# Define some useful constants
+# how many samples to cut out of the frequency transitions
+gate = 200
+
+sampleRate = 2e6
+
+
+#%%
 # import the binary file
 rawData_benGS = np.fromfile(
     "/Users/benjaminpattison/Documents/Projects/satNav/SDR_satellite_tracking/data/test5_benGS.dat",
@@ -51,22 +59,21 @@ repeaters here
 """
 # correlation of the two signals for just the first reference sample. this method uses the standard complex correlation talked about here:
 # http://www.panoradio-sdr.de/correlation-for-time-delay-analysis/
-sampleRate = 2e6
 xCorr = signal.correlate(benCplx[:nS_each], domCplx[:nS_each])
 lags = signal.correlation_lags(len(benCplx[:nS_each]), len(domCplx[:nS_each]))
 
 #%%
-# this method uses the differential phase talked about at the same link
-dPhase_benGS = np.diff(np.unwrap(np.angle(benCplx[:nS_each])))
-dPhase_domGS = np.diff(np.unwrap(np.angle(domCplx[:nS_each])))
-
-# append a zero to the beginning to make the length of the abs correlation (size fit)
-dPhase_benGS = np.append(0, dPhase_benGS)
-dPhase_domGS = np.append(0, dPhase_domGS)
+# this method uses the differential phase talked about at the same link on the first reference frequency sample
+dPhase_benGS = np.diff(np.unwrap(np.angle(benCplx[: nS_each - gate])))
+dPhase_domGS = np.diff(np.unwrap(np.angle(domCplx[: nS_each - gate])))
 
 # remove the mean
 dPhase_benGS = dPhase_benGS - np.mean(dPhase_benGS)
 dPhase_domGS = dPhase_domGS - np.mean(dPhase_domGS)
+
+# append a zero to the beginning to make the length of the abs correlation (size fit)
+dPhase_benGS = np.append(0, dPhase_benGS)
+dPhase_domGS = np.append(0, dPhase_domGS)
 
 dPhaseXcorr = signal.correlate(dPhase_benGS, dPhase_domGS)
 dPhaseXcorr_lags = signal.correlation_lags(len(dPhase_benGS), len(dPhase_domGS))
@@ -74,13 +81,40 @@ ref1 = max(signal.correlate(dPhase_benGS, dPhase_benGS))
 ref2 = max(signal.correlate(dPhase_domGS, dPhase_domGS))
 dPhaseXcorr_max = np.max(dPhaseXcorr)
 
-result = (100 * 2 * dPhaseXcorr_max) / (ref1 + ref2)
-print(result)
+refSig1Lag = np.abs(dPhaseXcorr_lags[np.argmax(dPhaseXcorr)]) / 2e6
+
+print(refSig1Lag)
+
+#%%
+# this method uses the differential phase talked about at the same link on the second reference frequency sample
+dPhase2_benGS = np.diff(np.unwrap(np.angle(benCplx[-nS_each + gate :])))
+dPhase2_domGS = np.diff(np.unwrap(np.angle(domCplx[-nS_each + gate :])))
+
+# remove the mean
+dPhase_benGS = dPhase2_benGS - np.mean(dPhase2_benGS)
+dPhase_domGS = dPhase2_domGS - np.mean(dPhase2_domGS)
+
+# append a zero to the beginning to make the length of the abs correlation (size fit)
+dPhase2_benGS = np.append(0, dPhase2_benGS)
+dPhase2_domGS = np.append(0, dPhase2_domGS)
+
+dPhaseXcorr2 = signal.correlate(dPhase2_benGS, dPhase2_domGS)
+dPhaseXcorr2_lags = signal.correlation_lags(len(dPhase2_benGS), len(dPhase2_domGS))
+# ref1 = max(signal.correlate(dPhase_benGS, dPhase_benGS))
+# ref2 = max(signal.correlate(dPhase_domGS, dPhase_domGS))
+dPhaseXcorr_max2 = np.max(dPhaseXcorr)
+
+refSig2Lag = np.abs(dPhaseXcorr2_lags[np.argmax(dPhaseXcorr2)]) / 2e6
+
+print(refSig2Lag)
 #%%
 # plot the differential phase correlation
-plt.plot(dPhaseXcorr_lags, dPhaseXcorr)
-plt.xlabel("Lag [samples]")
+xVals = dPhaseXcorr_lags / 2e6 + refSig1Lag
+plt.plot(xVals, dPhaseXcorr)
+plt.plot(xVals, dPhaseXcorr2)
+plt.xlabel("Lag [seconds]")
 plt.ylabel("Not sure... correlation maybe?")
+plt.xlim((-2, 2))
 plt.show()
 
 
