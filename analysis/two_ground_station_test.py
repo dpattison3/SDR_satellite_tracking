@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 #%%
 # Define some useful constants
 # how many samples to cut out of the frequency transitions
-gate = 200
+gate = int(200e3)
 # sample rate of the measurements
 sampleRate = 2e6
 
