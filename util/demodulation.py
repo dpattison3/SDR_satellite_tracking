@@ -64,7 +64,7 @@ def chunked_demodulate_signal(signal, sample_rate, chunk_size=1, band_filter_cut
 
     signal_length = len(signal)
     start_index = 0
-    chunk_sample_size = sample_rate * chunk_size
+    chunk_sample_size = int(sample_rate * chunk_size)
     end_index = chunk_sample_size
 
     audio_output = list()
