@@ -19,7 +19,7 @@ def compute_lpf_coeff(cutoff_frequency, sample_rate, order=10):
     return sos
 
 
-def filter_complex_signal(signal, cutoff_frequency, sample_rate, order=10):
+def filter_complex_signal(signal, cutoff_frequency, sample_rate, order=10, apply_mean_shift=True):
     """
     Compute the low pass filtered signal of the complex input signal.
     This splits the signal into a real and imaginary component, filters them separately, then
@@ -30,17 +30,18 @@ def filter_complex_signal(signal, cutoff_frequency, sample_rate, order=10):
         cutoff_frequency: the frequency of the LPF cutoff
         sample_rate: expected sample rate of the signal to be filtered
         order: order of the filter
+        apply_mean_shift: remove the DC component of the raw signal before filtering
 
     Returns:
         complex output signal that has been low pass filtered
     """
 
     # We have a complex signal but a real filter. Split the data, filter separately, then re-combine.
-    
-    mean_shifted_signal = signal - np.mean(signal)
+
+    mean_shifted_signal = (signal - np.mean(signal)) if apply_mean_shift else signal
     real_signal = np.real(mean_shifted_signal)
     imag_signal = np.imag(mean_shifted_signal)
-    
+
     sos = compute_lpf_coeff(cutoff_frequency, sample_rate, order=order)
 
     filtered_real = sosfilt(sos, real_signal)
@@ -50,7 +51,7 @@ def filter_complex_signal(signal, cutoff_frequency, sample_rate, order=10):
     return filtered_signal
 
 
-def filter_real_signal(signal, cutoff_frequency, sample_rate, order=10):
+def filter_real_signal(signal, cutoff_frequency, sample_rate, order=10, apply_mean_shift=True):
     """
     Compute the low pass filtered signal of the real input signal.
     see filter_complex_signal above.
@@ -60,6 +61,7 @@ def filter_real_signal(signal, cutoff_frequency, sample_rate, order=10):
         cutoff_frequency: the frequency of the LPF cutoff
         sample_rate: expected sample rate of the signal to be filtered
         order: order of the filter
+        apply_mean_shift: remove the DC component of the raw signal before filtering
 
     Returns:
         real output signal that has been low pass filtered
@@ -67,5 +69,5 @@ def filter_real_signal(signal, cutoff_frequency, sample_rate, order=10):
 
     # NOTE(dominic): Technically, this is a bit more expensive, but it's clean and I suspect for now
     # it's fine.
-    filtered_signal = filter_complex_signal(signal, cutoff_frequency, sample_rate, order)
+    filtered_signal = filter_complex_signal(signal, cutoff_frequency, sample_rate, order, apply_mean_shift)
     return np.real(filtered_signal)

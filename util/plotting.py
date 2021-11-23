@@ -15,19 +15,22 @@ def compute_fft_plot(signal, sampling_dt, center_frequency=0.0):
         signal: numpy.ndarray of 1-D complex signal to use
         sampling_dt: float of inverse of the sample rate
         center_frequency: float representing the center frequency of a demodulated signal
-    
+
     Returns:
         tuple of numpy.ndarray with the first being
     """
-    
+
     num_samples = len(signal)
     # Compute the FFT magnitudes and scale them appropriately.
     fft_frequency_magnitudes = fft(signal)
-    fft_frequency_magnitudes = 2.0 / num_samples * np.abs(fft_frequency_magnitudes) 
+    fft_frequency_magnitudes = 2.0 / num_samples * np.abs(fft_frequency_magnitudes)
     # Compute the corresponding frequencies.
     fft_frequencies = fftfreq(num_samples, sampling_dt) + center_frequency
 
-    return fft_frequencies, fft_frequency_magnitudes
+    # Shift the frequencies and their corresponding magnitudes because, by default, they start from
+    # 0, list positive values, then list negative values. The shift makes the frequencies
+    # monotonically increasing, perfect for plotting.
+    return np.fft.fftshift(fft_frequencies), np.fft.fftshift(fft_frequency_magnitudes)
 
 
 def compute_fft_plot_from_sample_rate(signal, sampling_rate, center_frequency=0.0):
@@ -38,7 +41,7 @@ def compute_fft_plot_from_sample_rate(signal, sampling_rate, center_frequency=0.
         signal: numpy.ndarray of 1-D complex signal to use
         sampling_rate: float or int of the sample rate
         center_frequency: float representing the center frequency of a demodulated signal
-    
+
     Returns:
         tuple of numpy.ndarray with the first being
     """
@@ -52,7 +55,7 @@ def compute_frequency_response(sos, sample_rate):
     Args:
         sos: filter parameters
         sample_rate: sample rate of the given filter
-    
+
     Returns:
         tuple of frequencies and their respective magnitudes in response to the filter
     """
@@ -73,7 +76,7 @@ def compute_lpf_frequency_response(cutoff_frequency, sample_rate, order=10):
         cutoff_frequency: frequency of the cutoff of the LPF
         sample_rate: sample rate of the given filter
         order: order of the filter
-    
+
     Returns:
         tuple of frequencies and their respective magnitudes in response to the filter
     """

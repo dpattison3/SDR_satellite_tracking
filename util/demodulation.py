@@ -8,7 +8,7 @@ from util.filtering import filter_complex_signal, filter_real_signal
 AUDIO_LPF_FREQUENCY = 20e3
 
 
-def demodulate_signal(signal, sample_rate, band_filter_cutoff=80000, downsample_rate=25):
+def demodulate_signal(signal, sample_rate, band_filter_cutoff=80000, downsample_rate=25, apply_output_filter=True):
     """
     Demodulates an FM signal. First, perform a LPF of input to the appropriate bandwidth. Next,
     diff the phase angles to get the data signal. LPF that signal to just the audible range.
@@ -17,8 +17,9 @@ def demodulate_signal(signal, sample_rate, band_filter_cutoff=80000, downsample_
     Args:
         signal: complex baseband input signal
         sample_rate: sample rate of raw signal
-        band_filter_cutoff: the first LPF of raw signal
+        band_filter_cutoff: the first LPF of raw IQ signal
         downsample_rate: the output will have sampling rate of sample_rate/downsample_rate
+        apply_output_filter: LPF the output at an audible cutoff frequency
 
     Returns:
         tuple of output audio signal and its associated sample rate
@@ -31,9 +32,10 @@ def demodulate_signal(signal, sample_rate, band_filter_cutoff=80000, downsample_
     # Difference the phase angle and convert to +/-pi range.
     phase_angle_diff = np.unwrap(np.diff(phase_angles))
 
-    filtered_phase_angle_diff = filter_real_signal(
-        signal=phase_angle_diff, cutoff_frequency=AUDIO_LPF_FREQUENCY, sample_rate=sample_rate)
-
+    filtered_phase_angle_diff = phase_angle_diff
+    if apply_output_filter:
+        filtered_phase_angle_diff = filter_real_signal(
+            signal=phase_angle_diff, cutoff_frequency=AUDIO_LPF_FREQUENCY, sample_rate=sample_rate)
 
     phase_angle_diff_downsampled = filtered_phase_angle_diff[::downsample_rate]
     phase_angle_diff_downsampled_sample_rate = sample_rate / float(downsample_rate)
@@ -64,7 +66,7 @@ def chunked_demodulate_signal(signal, sample_rate, chunk_size=1, band_filter_cut
 
     signal_length = len(signal)
     start_index = 0
-    chunk_sample_size = sample_rate * chunk_size
+    chunk_sample_size = int(sample_rate * chunk_size)
     end_index = chunk_sample_size
 
     audio_output = list()
@@ -75,7 +77,8 @@ def chunked_demodulate_signal(signal, sample_rate, chunk_size=1, band_filter_cut
         end_index = min(end_index, signal_length - 1)
 
         signal_crop = signal[start_index:end_index]
-        audio_crop, audio_fs = demodulate_signal(signal_crop, sample_rate, band_filter_cutoff, downsample_rate)
+        audio_crop, audio_fs = demodulate_signal(signal_crop, sample_rate, band_filter_cutoff,
+                                                 downsample_rate)
         audio_output.extend(audio_crop.tolist())
 
         start_index = end_index
