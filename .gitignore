@@ -13,3 +13,4 @@ venv/
 
 # other misc things
 .DS_Store
+*.pyc
