@@ -30,7 +30,9 @@ def demodulate_signal(signal, sample_rate, band_filter_cutoff=80000, downsample_
 
     phase_angles = np.angle(filtered_signal)
     # Difference the phase angle and convert to +/-pi range.
-    phase_angle_diff = np.unwrap(np.diff(phase_angles))
+    phase_angle_diff = np.diff(phase_angles)
+    phase_angle_diff[phase_angle_diff < -np.pi] += 2 * np.pi
+    phase_angle_diff[phase_angle_diff > np.pi] -= 2 * np.pi
 
     filtered_phase_angle_diff = phase_angle_diff
     if apply_output_filter:
