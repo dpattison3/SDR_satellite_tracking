@@ -1,6 +1,6 @@
 import numpy as np
 
-from util.filtering import filter_complex_signal, filter_real_signal
+from util.filtering import low_pass_filter_complex_signal, low_pass_filter_real_signal
 
 
 # Cutoff used in filtering the audio signal. Since this is the top of the audio spectrum, we just
@@ -30,8 +30,8 @@ def demodulate_signal(signal, sample_rate, base_band_filter_cutoff=60000,
         tuple of output audio signal and its associated sample rate
     """
 
-    filtered_signal = filter_complex_signal(signal=signal, cutoff_frequency=base_band_filter_cutoff,
-                                            sample_rate=sample_rate)
+    filtered_signal = low_pass_filter_complex_signal(
+        signal=signal, cutoff_frequency=base_band_filter_cutoff, sample_rate=sample_rate)
 
     filtered_signal_downsampled = filtered_signal[::base_band_downsample_rate]
     filtered_signal_sample_rate = int(sample_rate / base_band_downsample_rate)
@@ -45,7 +45,7 @@ def demodulate_signal(signal, sample_rate, base_band_filter_cutoff=60000,
 
     filtered_phase_angle_diff = angle_diff
     if apply_output_filter:
-        filtered_phase_angle_diff = filter_real_signal(
+        filtered_phase_angle_diff = low_pass_filter_real_signal(
             signal=angle_diff, cutoff_frequency=audio_filter_cutoff,
             sample_rate=filtered_signal_sample_rate
         )
