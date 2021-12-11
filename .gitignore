@@ -5,6 +5,9 @@
 # Exclude ipython checkpoints.
 **/.ipynb_checkpoints/*
 
+# Exclude python caching
+**/__pycache__/*
+
 # virtual environments
 venv/
 
