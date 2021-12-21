@@ -78,7 +78,7 @@ def low_pass_filter_complex_signal(signal, cutoff_frequency, sample_rate, order=
         complex output signal that has been low pass filtered
     """
 
-    sos = compute_bandpass_coeff(cutoff_frequency, sample_rate, order=order)
+    sos = compute_lpf_coeff(cutoff_frequency, sample_rate, order=order)
     return filter_complex_signal(signal, sos, apply_mean_shift)
 
 
