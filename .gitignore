@@ -16,3 +16,6 @@ venv/
 
 # other misc things
 .DS_Store
+
+# Exclude build output
+build/

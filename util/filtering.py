@@ -105,6 +105,27 @@ def band_pass_filter_complex_signal(signal, low_cutoff_frequency, high_cutoff_fr
     return filter_complex_signal(signal, sos, apply_mean_shift)
 
 
+def band_pass_filter_real_signal(signal, low_cutoff_frequency, high_cutoff_frequency,
+                                    sample_rate, order=10, apply_mean_shift=True):
+    """
+    Compute the band pass filtered signal of the real input signal.
+
+    Args:
+        signal: real signal to filter
+        low_cutoff_frequency: the frequency of the start of the bandpass
+        high_cutoff_frequency: the frequency of the start of the bandpass
+        sample_rate: expected sample rate of the signal to be filtered
+        order: order of the filter
+        apply_mean_shift: remove the DC component of the raw signal before filtering
+
+    Returns:
+        real output signal that has been low pass filtered
+    """
+    sos = compute_bandpass_coeff(low_cutoff_frequency, high_cutoff_frequency, sample_rate,
+                                 order=order)
+    return np.real(filter_complex_signal(signal, sos, apply_mean_shift))
+
+
 def low_pass_filter_real_signal(signal, cutoff_frequency, sample_rate, order=10,
                                 apply_mean_shift=True):
     """
