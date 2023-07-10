@@ -34,6 +34,8 @@ struct Configuration {
     double recording_length;          // [s]
     // Where to save the resulting wav file.
     std::string output_audio_file;
+    // Where to save the resulting raw IQ file.
+    std::string output_iq_file;
 };
 
 // It's assumed (and verified) that there is only one receiving channel.
@@ -52,11 +54,12 @@ const Configuration DEFAULT_CONFIGURATION = {
         // AGC (automatric gain control) setpoint measured in dBfs.
         {"agc_setpoint", "-30"},
     },
-    .tuned_frequency = 99.7e6,
+    .tuned_frequency = 103.7e6,
     .sample_frequency = 2e6,
     .audio_sample_frequency = 44100,
-    .recording_length = 10,
-    .output_audio_file = "data/output.wav"
+    .recording_length = 5,
+    .output_audio_file = "data/out_alt.wav",
+    .output_iq_file = "data/out_iq.rawiq"
 };
 
 
@@ -155,6 +158,9 @@ void RecordFMAudio(SoapySDR::Device* const device, const Configuration& configur
         configuration.audio_sample_frequency * configuration.recording_length
     )));
 
+    // Incrementally write to a binary file for the raw IQ data.
+    auto raw_iq_file = std::fstream(configuration.output_iq_file, std::ios::out | std::ios::binary);
+
     // Preallocate loop varialbes.
     long long read_time_ns = 0, previous_read_time_ns = 0;
     int read_stream_return_flags = 0, num_samples_read = 0;
@@ -166,10 +172,19 @@ void RecordFMAudio(SoapySDR::Device* const device, const Configuration& configur
     const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     int total_num_samples_read = 0;
 
+    print("running for", num_iterations, "iterations");
     for (int j = 0; j < num_iterations; j++) {
         num_samples_read = device->readStream(stream, buffs, max_buffer_size,
             read_stream_return_flags, read_time_ns);
         total_num_samples_read += num_samples_read;
+
+        if (num_samples_read <= 0) {
+            print_error("Invalid read from device! num_samples_read", num_samples_read);
+            break;
+        }
+
+        raw_iq_file.write((char*)buffs[0], sizeof(float)*2*num_samples_read);
+        raw_iq_file.seekp(0, std::ios_base::end);
 
         // Copy the data out of the raw buffer.
         // Code copied from elsewhere. The void** is an array of complex floating point numbers.
@@ -215,6 +230,7 @@ void RecordFMAudio(SoapySDR::Device* const device, const Configuration& configur
 
     device->closeStream(stream);
     free(buffs[0]);
+    raw_iq_file.close();
 
     print("Saving audio file with:", audio_output.size(), "samples.");
     AudioFile<float> wav_file;
@@ -224,12 +240,14 @@ void RecordFMAudio(SoapySDR::Device* const device, const Configuration& configur
     for (int i = 0; i < wav_file.getNumSamplesPerChannel(); ++i) {
         wav_file.samples[/* channel */ 0][i] = audio_output[i];
     }
-    wav_file.save(std::string(configuration.output_audio_file), AudioFileFormat::Wave);
+    wav_file.save(configuration.output_audio_file, AudioFileFormat::Wave);
 }
+
 
 int main() {
     // NOTE(dominic): I've written this mostly to interact with the SDRPlay RSPdx. A couple general
     // notes on that specifically that I've found and don't want to forget.
+    //
     // The gain setting is confusingly accessible in both the
     // settings API (getSettingInfo, readSetting, writeSetting) and the gain API (getGain, setGain).
     // The settings interface is confusing because it lists a set of possible options that do not

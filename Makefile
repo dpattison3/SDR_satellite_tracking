@@ -1,7 +1,7 @@
-all: pll_util soapy_util
+all: pll_util sdr_record
 
 pll_util:
 	gcc -shared -Wl,-soname,phase_locked_loop -o build/phase_locked_loop.so -fPIC util/phase_locked_loop.c -O3 -ffast-math
 
-soapy_util:
-	g++ util/soapy_test.cc -o build/soapy_test -lSoapySDR
+sdr_record:
+	g++ util/sdr_record.cc -o build/sdr_record -lSoapySDR
